@@ -9,8 +9,8 @@ import (
 	"cloud.google.com/go/pubsub"
 	"go.uber.org/zap"
 
-	"github.com/sustglobal/sust-go/component"
-	"github.com/sustglobal/sust-go/event"
+	"github.com/sustglobal/gost/component"
+	"github.com/sustglobal/gost/event"
 )
 
 type MessageHandler interface {

@@ -1,4 +1,4 @@
-module github.com/sustglobal/sust-go
+module github.com/sustglobal/gost
 
 go 1.16
 

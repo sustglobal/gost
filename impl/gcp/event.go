@@ -6,8 +6,8 @@ import (
 
 	"cloud.google.com/go/pubsub"
 
-	"github.com/sustglobal/sust-go/component"
-	"github.com/sustglobal/sust-go/event"
+	"github.com/sustglobal/gost/component"
+	"github.com/sustglobal/gost/event"
 )
 
 func NewPubSubEventPublisher(project, topic string) (*pubsubEventPublisher, error) {

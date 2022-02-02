@@ -13,8 +13,8 @@ import (
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
 
-	"github.com/sustglobal/sust-go/event"
-	"github.com/sustglobal/sust-go/httpapi"
+	"github.com/sustglobal/gost/event"
+	"github.com/sustglobal/gost/httpapi"
 )
 
 func NewFromEnv() (*Component, error) {
