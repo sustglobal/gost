@@ -10,10 +10,10 @@ import (
 )
 
 type Config struct {
-	BindHTTPServer          string        `env:"GUST_BIND_HTTP_SERVER"`
-	ExposeMetrics           bool          `env:"GUST_EXPOSE_METRICS"`
-	ExposeHealth            bool          `env:"GUST_EXPOSE_HEALTH"`
-	GracefulShutdownTimeout time.Duration `env:"GUST_GRACEFUL_SHUTDOWN_TIMEOUT"`
+	BindHTTPServer          string        `env:"GOST_BIND_HTTP_SERVER"`
+	ExposeMetrics           bool          `env:"GOST_EXPOSE_METRICS"`
+	ExposeHealth            bool          `env:"GOST_EXPOSE_HEALTH"`
+	GracefulShutdownTimeout time.Duration `env:"GOST_GRACEFUL_SHUTDOWN_TIMEOUT"`
 }
 
 func DefaultConfig() Config {
