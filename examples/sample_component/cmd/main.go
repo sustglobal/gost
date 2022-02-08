@@ -20,7 +20,7 @@ func main() {
 		panic(err)
 	}
 
-	cmp.HTTPRouter.HandleFunc("/domain", sample_component.DummyHandlerFunc)
+	cmp.HTTPRouter.HandleFunc("/sample", sample_component.NewDummyHandlerFunc(cfg.CustomValue))
 
 	cmp.Run()
 }

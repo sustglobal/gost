@@ -1,7 +1,13 @@
 package sample_component
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
 
-func DummyHandlerFunc(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(204)
+func NewDummyHandlerFunc(val string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		fmt.Fprintf(w, `{"CUSTOM_VALUE": %q}`, val)
+	}
 }
