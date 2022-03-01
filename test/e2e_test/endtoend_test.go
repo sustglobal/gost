@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/sustglobal/gost/component"
+	"github.com/sustglobal/gost/event"
 	"github.com/sustglobal/gost/examples/sample_component"
 	"github.com/sustglobal/gost/impl/gcp"
 
@@ -29,6 +30,7 @@ type PubSubConfig struct {
 func TestE2E(t *testing.T) {
 	os.Setenv("PUBSUB_EMULATOR_HOST", "localhost:8085")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+
 	pubsub_cfg := PubSubConfig{GCPProjectID: "Test", GCPPubSubTopic: "TestTopic", GCPSubscriptionName: "TestSub", context: ctx, options: []option.ClientOption{option.WithoutAuthentication()}}
 	setup_client(pubsub_cfg)
 
@@ -43,9 +45,11 @@ func TestE2E(t *testing.T) {
 		panic(err)
 	}
 
+	evCh := make(chan *event.Event, 1)
+
 	cont := &sample_component.Controller{
-		Data:   "TEST!",
-		Logger: cmp.Logger,
+		Logger:    cmp.Logger,
+		EventChan: evCh,
 	}
 
 	cmp.InboundEventRouter.Mount(
@@ -65,7 +69,28 @@ func TestE2E(t *testing.T) {
 	gcp.PublishEventsToPubSub(cmp, pubsub_cfg.GCPProjectID, pubsub_cfg.GCPPubSubTopic)
 	gcp.ListenForPubSubMessages(cmp)
 
-	cmp.Run()
+	// will run in background until ctrl+c or Stop() is called
+	go cmp.Run()
+	defer cmp.Stop()
+
+	// explicitly send event for controller to handle
+	ev := event.NewEvent(sample_component.Type_NewDummyEvent)
+	cmp.OutboundEventRouter.HandleEvent(context.Background(), ev)
+
+	// Wait for controller to receive event and close result channel.
+	// Also check for timeout here since this should be quite fast.
+	var recv *event.Event
+	select {
+	case recv = <-evCh:
+	case <-ctx.Done():
+		t.Fatalf("timeout while waiting for event")
+	}
+
+	wantType := sample_component.Type_NewDummyEvent
+	gotType := recv.Type
+	if wantType != gotType {
+		t.Errorf("received event with incorrect type: want=%v got=%v", wantType, gotType)
+	}
 }
 
 func setup_client(pubsub_cfg PubSubConfig) {

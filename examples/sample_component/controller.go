@@ -2,8 +2,6 @@ package sample_component
 
 import (
 	"context"
-	"fmt"
-	"log"
 
 	"github.com/sustglobal/gost/event"
 
@@ -11,15 +9,12 @@ import (
 )
 
 type Controller struct {
-	Data string
+	EventChan chan<- *event.Event
 	*zap.Logger
 }
 
 func (c *Controller) DoSomething(ctx context.Context, ev *event.Event) error {
-	// Doesn't actually do anything...
-	log.Println("I did a thing!")
-	if ev == nil {
-		return fmt.Errorf("something is wrong")
-	}
+	c.Logger.Info("controller.DoSomething received event", zap.Reflect("event", ev))
+	c.EventChan <- ev
 	return nil
 }
