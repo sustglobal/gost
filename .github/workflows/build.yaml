@@ -17,7 +17,7 @@ jobs:
         go-version: 1.17
 
     - name: Start PubSub Emulator
-      run: docker-compose -f "./test/e2e_test/docker-compose.yaml" up
+      run: docker-compose -f "./test/e2e_test/docker-compose.yaml" up -d
 
     - name: Test
       run: go test -v ./...
