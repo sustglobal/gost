@@ -15,10 +15,6 @@ import (
 	"google.golang.org/api/option"
 )
 
-type ServiceConfig struct {
-	CustomValue string `env:"CUSTOM_VALUE"`
-}
-
 type PubSubConfig struct {
 	GCPProjectID        string
 	GCPPubSubTopic      string
@@ -31,18 +27,22 @@ func TestE2E(t *testing.T) {
 	os.Setenv("PUBSUB_EMULATOR_HOST", "localhost:8085")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
-	pubsub_cfg := PubSubConfig{GCPProjectID: "Test", GCPPubSubTopic: "TestTopic", GCPSubscriptionName: "TestSub", context: ctx, options: []option.ClientOption{option.WithoutAuthentication()}}
-	setup_client(pubsub_cfg)
+	pubsubCfg := PubSubConfig{
+		GCPProjectID:        "Test",
+		GCPPubSubTopic:      "TestTopic",
+		GCPSubscriptionName: "TestSub",
+		context:             ctx,
+		options:             []option.ClientOption{option.WithoutAuthentication()},
+	}
+
+	// Set up the PubSub Client, create the Topic, and then create the Subscription.
+	client, _ := pubsub.NewClient(pubsubCfg.context, pubsubCfg.GCPProjectID)
+	topic, _ := client.CreateTopic(pubsubCfg.context, pubsubCfg.GCPPubSubTopic)
+	client.CreateSubscription(pubsubCfg.context, pubsubCfg.GCPSubscriptionName, pubsub.SubscriptionConfig{Topic: topic})
 
 	cmp, err := component.NewFromEnv()
 	if err != nil {
-		panic(err)
-	}
-
-	var service_cfg ServiceConfig
-
-	if err := component.LoadFromEnv(&service_cfg); err != nil {
-		panic(err)
+		t.Fatalf("component.NewFromEnv failed with err: %v", err)
 	}
 
 	evCh := make(chan *event.Event, 1)
@@ -66,7 +66,7 @@ func TestE2E(t *testing.T) {
 		},
 	)
 
-	gcp.PublishEventsToPubSub(cmp, pubsub_cfg.GCPProjectID, pubsub_cfg.GCPPubSubTopic)
+	gcp.PublishEventsToPubSub(cmp, pubsubCfg.GCPProjectID, pubsubCfg.GCPPubSubTopic)
 	gcp.ListenForPubSubMessages(cmp)
 
 	// will run in background until ctrl+c or Stop() is called
@@ -91,11 +91,4 @@ func TestE2E(t *testing.T) {
 	if wantType != gotType {
 		t.Errorf("received event with incorrect type: want=%v got=%v", wantType, gotType)
 	}
-}
-
-func setup_client(pubsub_cfg PubSubConfig) {
-	client, _ := pubsub.NewClient(pubsub_cfg.context, pubsub_cfg.GCPProjectID)
-
-	topic, _ := client.CreateTopic(pubsub_cfg.context, pubsub_cfg.GCPPubSubTopic)
-	client.CreateSubscription(pubsub_cfg.context, pubsub_cfg.GCPSubscriptionName, pubsub.SubscriptionConfig{Topic: topic})
 }
