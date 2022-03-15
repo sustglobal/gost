@@ -14,6 +14,7 @@ type Config struct {
 	ExposeMetrics           bool          `env:"GOST_EXPOSE_METRICS"`
 	ExposeHealth            bool          `env:"GOST_EXPOSE_HEALTH"`
 	GracefulShutdownTimeout time.Duration `env:"GOST_GRACEFUL_SHUTDOWN_TIMEOUT"`
+	Debug                   bool          `env:"GOST_DEBUG"`
 }
 
 func DefaultConfig() Config {

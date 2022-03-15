@@ -26,7 +26,15 @@ func NewFromEnv() (*Component, error) {
 }
 
 func New(cfg Config) (*Component, error) {
-	logger, err := zap.NewProduction()
+	var logger *zap.Logger
+	var err error
+
+	if cfg.Debug {
+		logger, err = zap.NewDevelopment()
+	} else {
+		logger, err = zap.NewProduction()
+	}
+
 	if err != nil {
 		return nil, err
 	}
