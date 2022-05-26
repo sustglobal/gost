@@ -10,11 +10,11 @@ import (
 )
 
 type Config struct {
-	BindHTTPServer          string        `env:"GOST_BIND_HTTP_SERVER"`
-	ExposeMetrics           bool          `env:"GOST_EXPOSE_METRICS"`
-	ExposeHealth            bool          `env:"GOST_EXPOSE_HEALTH"`
-	GracefulShutdownTimeout time.Duration `env:"GOST_GRACEFUL_SHUTDOWN_TIMEOUT"`
-	Debug                   bool          `env:"GOST_DEBUG"`
+	BindHTTPServer          string        `env:"GOST_BIND_HTTP_SERVER" default:"0.0.0.0:8080"`
+	ExposeMetrics           bool          `env:"GOST_EXPOSE_METRICS" default:"false"`
+	ExposeHealth            bool          `env:"GOST_EXPOSE_HEALTH" default:"false"`
+	GracefulShutdownTimeout time.Duration `env:"GOST_GRACEFUL_SHUTDOWN_TIMEOUT" default:"3600"`
+	Debug                   bool          `env:"GOST_DEBUG" default:"false"`
 }
 
 func DefaultConfig() Config {
@@ -34,6 +34,7 @@ func LoadFromEnv(obj interface{}) error {
 
 	for i := 0; i < typ.NumField(); i++ {
 		tagValue := typ.Field(i).Tag.Get("env")
+		defaultTagValue := typ.Field(i).Tag.Get("default")
 		field := val.Elem().Field(i)
 
 		if tagValue == "" {
@@ -44,7 +45,7 @@ func LoadFromEnv(obj interface{}) error {
 
 		// Skip if env unset or set to empty string
 		if envValStr == "" {
-			continue
+			envValStr = defaultTagValue
 		}
 
 		switch field.Type() {
