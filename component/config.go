@@ -13,7 +13,7 @@ type Config struct {
 	BindHTTPServer          string        `env:"GOST_BIND_HTTP_SERVER" default:"0.0.0.0:8080"`
 	ExposeMetrics           bool          `env:"GOST_EXPOSE_METRICS" default:"false"`
 	ExposeHealth            bool          `env:"GOST_EXPOSE_HEALTH" default:"false"`
-	GracefulShutdownTimeout time.Duration `env:"GOST_GRACEFUL_SHUTDOWN_TIMEOUT" default:"3600"`
+	GracefulShutdownTimeout time.Duration `env:"GOST_GRACEFUL_SHUTDOWN_TIMEOUT" default:"60 * time.Second"`
 	Debug                   bool          `env:"GOST_DEBUG" default:"false"`
 }
 
