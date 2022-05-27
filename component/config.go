@@ -43,9 +43,12 @@ func LoadFromEnv(obj interface{}) error {
 
 		envValStr := os.Getenv(tagValue)
 
-		// Skip if env unset or set to empty string
-		if envValStr == "" {
+		if (envValStr == "") && (defaultTagValue != "") {
 			envValStr = defaultTagValue
+		}
+		// Skip if env unset or set to empty string and no default provided
+		if (envValStr == "") && (defaultTagValue == "") {
+			continue
 		}
 
 		switch field.Type() {
